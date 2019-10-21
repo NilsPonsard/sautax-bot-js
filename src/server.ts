@@ -12,6 +12,13 @@ const token = token_file.toString().replace("\n", "")
 
 export const prefix = "$"
 
+
+
+function help() {
+
+}
+
+
 function system(msg: Discord.Message) {
     let platform = process.platform
     let usage = process.resourceUsage()
@@ -51,6 +58,9 @@ client.on('message', msg => {
                 break
             case "system":
                 system(msg)
+                break
+            case "help":
+                help()
                 break
 
         }
