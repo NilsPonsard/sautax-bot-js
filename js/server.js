@@ -8,13 +8,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Discord = __importStar(require("discord.js"));
-var fs_1 = require("fs");
 var lol = __importStar(require("./lol"));
 var image = __importStar(require("./image"));
 var client = new Discord.Client();
-var token_file = fs_1.readFileSync("token");
-var token = token_file.toString().replace("\n", "");
 exports.prefix = "$";
+function help() {
+}
 function system(msg) {
     var platform = process.platform;
     var usage = process.resourceUsage();
@@ -50,8 +49,11 @@ client.on('message', function (msg) {
             case "system":
                 system(msg);
                 break;
+            case "help":
+                help();
+                break;
         }
         console.log(msg.author.tag + " issued " + args[0]);
     }
 });
-client.login(token);
+client.login(process.env.BOT_TOKEN);
