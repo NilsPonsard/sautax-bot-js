@@ -12,6 +12,17 @@ const token = token_file.toString().replace("\n", "")
 
 export const prefix = "$"
 
+function help(msg: Discord.Message) {
+    let embed = new Discord.RichEmbed()
+    embed.setTitle("Aide")
+    embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-js/help")
+    msg.channel.send("", embed)
+
+
+}
+
+
+
 function system(msg: Discord.Message) {
     let platform = process.platform
     let usage = process.resourceUsage()
@@ -31,6 +42,11 @@ function system(msg: Discord.Message) {
 
 }
 
+function say(msg: Discord.Message) {
+    let message = msg.content
+    msg.channel.send(msg.content.slice(5))
+    msg.delete()
+}
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -52,7 +68,12 @@ client.on('message', msg => {
             case "system":
                 system(msg)
                 break
-
+            case "say":
+                say(msg)
+                break
+            case "help":
+                help(msg)
+                break
         }
 
         console.log(`${msg.author.tag} issued ${args[0]}`)
