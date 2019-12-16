@@ -12,7 +12,7 @@ export const prefix = "$"
 function help(msg: Discord.Message) {
     let embed = new Discord.RichEmbed()
     embed.setTitle("Aide")
-    embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-js/help")
+    embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-discord-js.html")
     msg.channel.send("", embed)
 
 
