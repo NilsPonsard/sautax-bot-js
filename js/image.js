@@ -103,8 +103,8 @@ function mandelbrot(msg) {
             msg.channel.send("l'argument N doit être un entier, r v et b des flottants");
         }
     }
-    var width = 500;
-    var height = 500;
+    var width = 1000;
+    var height = 1000;
     var level_ratio = 255 / max_n;
     //let scalex = 2.0 / width
     //let scaley = 2.0 / height
