@@ -1,4 +1,5 @@
-export const apps = [{
+module.exports = {
+ apps : [{
     name: "discord-bot",
     script: "./js/server.js",
     watch: true,
@@ -8,4 +9,4 @@ export const apps = [{
     env_production: {
         NODE_ENV: "production",
     }
-}];
+}]}
