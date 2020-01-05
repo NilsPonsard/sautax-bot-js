@@ -2,6 +2,7 @@ import * as Discord from "discord.js"
 import { readFileSync } from "fs";
 import * as lol from "./lol"
 import * as image from "./image"
+import * as cpp from "./cpp"
 import * as child_process from "child_process"
 import { userInfo } from "os";
 const client = new Discord.Client()
@@ -70,6 +71,9 @@ client.on('message', msg => {
                 break
             case "help":
                 help(msg)
+                break
+            case "cpp":
+                cpp.cpp(msg)
                 break
         }
 

@@ -10,12 +10,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Discord = __importStar(require("discord.js"));
 var lol = __importStar(require("./lol"));
 var image = __importStar(require("./image"));
+var cpp = __importStar(require("./cpp"));
 var client = new Discord.Client();
 exports.prefix = "$";
 function help(msg) {
     var embed = new Discord.RichEmbed();
     embed.setTitle("Aide");
-    embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-js/help");
+    embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-discord-js.html");
     msg.channel.send("", embed);
 }
 function system(msg) {
@@ -63,6 +64,9 @@ client.on('message', function (msg) {
                 break;
             case "help":
                 help(msg);
+                break;
+            case "cpp":
+                cpp.cpp(msg);
                 break;
         }
         console.log(msg.author.tag + " issued " + args[0]);
