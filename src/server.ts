@@ -7,6 +7,9 @@ import * as child_process from "child_process"
 import { userInfo } from "os";
 const client = new Discord.Client()
 
+let token_file = readFileSync("token")
+
+const token = token_file.toString().replace("\n", "")
 
 export const prefix = "$"
 
@@ -86,5 +89,5 @@ client.on('message', msg => {
 
 
 
-client.login(process.env.BOT_TOKEN)
+client.login(token)
 
