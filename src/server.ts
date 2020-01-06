@@ -87,6 +87,9 @@ client.on('message', msg => {
             case "?":
                 google(args.slice(1).join(), msg)
                 break
+            case "rtfm":
+                rtfm(msg)
+                break
         }
 
         console.log(`${msg.author.tag} issued ${args[0]}`)
