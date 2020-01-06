@@ -25,7 +25,7 @@ function google(recherche: string, msg: Discord.Message): void {
     msg.channel.send(`https://www.google.com/search?q=${recherche}`)
 }
 
-function rtfm(msg): void {
+function rtfm(msg: Discord.Message): void {
     msg.channel.send({ files: ['https://binuxlubuntu.files.wordpress.com/2009/10/mao_rtfm_vectorize_by_cmenghi.png'] })
 }
 
