@@ -21,7 +21,13 @@ function help(msg: Discord.Message) {
 
 
 }
+function google(recherche: string, msg: Discord.Message): void {
+    msg.channel.send(`https://www.google.com/search?q=${recherche}`)
+}
 
+function rtfm(msg): void {
+    msg.channel.send({ files: ['https://binuxlubuntu.files.wordpress.com/2009/10/mao_rtfm_vectorize_by_cmenghi.png'] })
+}
 
 
 function system(msg: Discord.Message) {
@@ -77,6 +83,9 @@ client.on('message', msg => {
                 break
             case "cpp":
                 cpp.cpp(msg)
+                break
+            case "?":
+                google(args.slice(1).join(), msg)
                 break
         }
 
