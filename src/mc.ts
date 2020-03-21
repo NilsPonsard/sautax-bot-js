@@ -29,6 +29,24 @@ export function mc(msg: Discord.Message) {
                     msg.reply("vous n'avez pas la permission")
                 }
                 break
+            case "stop":
+                if (mcModos.lastIndexOf(msg.author.id) !== -1) {
+                    msg.reply("stopping server")
+                    exec("ssh 10.188.27.48 screen -S pixel -p 0 -X stuff 'stop^M'", (err, stdout, stderr) => {
+                        console.log(err, stdout, stderr)
+                    })
+                } else {
+                    msg.reply("vous n'avez pas la permission")
+                }
+            case "say":
+                if (mcModos.lastIndexOf(msg.author.id) !== -1) {
+                    msg.reply("stopping server")
+                    exec(`ssh 10.188.27.48 screen -S pixel -p 0 -X stuff 'say ${args.slice(1).join(" ")} ^M'`, (err, stdout, stderr) => {
+                        console.log(err, stdout, stderr)
+                    })
+                } else {
+                    msg.reply("vous n'avez pas la permission")
+                }
         }
     }
 
