@@ -5,6 +5,7 @@ import * as image from "./image"
 import * as cpp from "./cpp"
 import * as child_process from "child_process"
 import { userInfo } from "os";
+import * as mc from "./mc"
 const client = new Discord.Client()
 
 let token_file = readFileSync("token")
@@ -89,6 +90,9 @@ client.on('message', msg => {
                 break
             case "rtfm":
                 rtfm(msg)
+                break
+            case "mc":
+                mc.mc(msg)
                 break
         }
 

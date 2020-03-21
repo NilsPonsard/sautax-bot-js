@@ -12,6 +12,7 @@ var fs_1 = require("fs");
 var lol = __importStar(require("./lol"));
 var image = __importStar(require("./image"));
 var cpp = __importStar(require("./cpp"));
+var mc = __importStar(require("./mc"));
 var client = new Discord.Client();
 var token_file = fs_1.readFileSync("token");
 var token = token_file.toString().replace("\n", "");
@@ -82,6 +83,9 @@ client.on('message', function (msg) {
                 break;
             case "rtfm":
                 rtfm(msg);
+                break;
+            case "mc":
+                mc.mc(msg);
                 break;
         }
         console.log(msg.author.tag + " issued " + args[0]);
