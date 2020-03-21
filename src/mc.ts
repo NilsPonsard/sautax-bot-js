@@ -4,7 +4,7 @@ import { readFileSync, promises, readFile } from "fs";
 import * as utils from "./utils";
 import { exec } from "child_process";
 
-let mcModos = []
+let mcModos: Array<string> = []
 
 let modosFile = readFileSync("mcModos", "utf-8")
 mcModos = modosFile.split("\n")
@@ -17,11 +17,17 @@ export function mc(msg: Discord.Message) {
     else {
         switch (args[0]) {
             case "start":
-                msg.reply("starting server")
-                console.log("ssh...")
-                exec("ssh 10.188.27.48 tmux new-session -d -s pixel '/home/sautax/startPixelmon.sh'", (err, stdout, stderr) => {
-                    console.log(err, stdout, stderr)
-                })
+                if (mcModos.lastIndexOf(msg.author.id) !== -1) {
+
+                    msg.reply("starting server")
+
+                    exec("ssh 10.188.27.48 tmux new-session -d -s pixel '/home/sautax/startPixelmon.sh'", (err, stdout, stderr) => {
+                        console.log(err, stdout, stderr)
+                    })
+                }
+                else {
+                    msg.reply("vous n'avez pas la permission")
+                }
                 break
         }
     }
