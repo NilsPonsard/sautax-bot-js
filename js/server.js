@@ -11,10 +11,17 @@ var Discord = __importStar(require("discord.js"));
 var fs_1 = require("fs");
 var lol = __importStar(require("./lol"));
 var image = __importStar(require("./image"));
+var cpp = __importStar(require("./cpp"));
 var client = new Discord.Client();
 var token_file = fs_1.readFileSync("token");
 var token = token_file.toString().replace("\n", "");
 exports.prefix = "$";
+function help(msg) {
+    var embed = new Discord.RichEmbed();
+    embed.setTitle("Aide");
+    embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-discord-js.html");
+    msg.channel.send("", embed);
+}
 function system(msg) {
     var platform = process.platform;
     var usage = process.resourceUsage();
@@ -30,6 +37,11 @@ function system(msg) {
     embed.addField("Platform", platform);
     embed.addField("Uptime", uptime + " S");
     msg.channel.send("", embed);
+}
+function say(msg) {
+    var message = msg.content;
+    msg.channel.send(msg.content.slice(5));
+    msg.delete();
 }
 client.on("ready", function () {
     console.log("Logged in as " + client.user.tag + "!");
@@ -49,6 +61,15 @@ client.on('message', function (msg) {
                 break;
             case "system":
                 system(msg);
+                break;
+            case "say":
+                say(msg);
+                break;
+            case "help":
+                help(msg);
+                break;
+            case "cpp":
+                cpp.cpp(msg);
                 break;
         }
         console.log(msg.author.tag + " issued " + args[0]);

@@ -2,6 +2,7 @@ import * as Discord from "discord.js"
 import { readFileSync } from "fs";
 import * as lol from "./lol"
 import * as image from "./image"
+import * as cpp from "./cpp"
 import * as child_process from "child_process"
 import { userInfo } from "os";
 const client = new Discord.Client()
@@ -11,6 +12,23 @@ let token_file = readFileSync("token")
 const token = token_file.toString().replace("\n", "")
 
 export const prefix = "$"
+
+function help(msg: Discord.Message) {
+    let embed = new Discord.RichEmbed()
+    embed.setTitle("Aide")
+    embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-discord-js.html")
+    msg.channel.send("", embed)
+
+
+}
+function google(recherche: string, msg: Discord.Message): void {
+    msg.channel.send(`https://www.google.com/search?q=${recherche}`)
+}
+
+function rtfm(msg: Discord.Message): void {
+    msg.channel.send({ files: ['https://binuxlubuntu.files.wordpress.com/2009/10/mao_rtfm_vectorize_by_cmenghi.png'] })
+}
+
 
 function system(msg: Discord.Message) {
     let platform = process.platform
@@ -31,6 +49,11 @@ function system(msg: Discord.Message) {
 
 }
 
+function say(msg: Discord.Message) {
+    let message = msg.content
+    msg.channel.send(msg.content.slice(5))
+    msg.delete()
+}
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -52,13 +75,28 @@ client.on('message', msg => {
             case "system":
                 system(msg)
                 break
-
+            case "say":
+                say(msg)
+                break
+            case "help":
+                help(msg)
+                break
+            case "cpp":
+                cpp.cpp(msg)
+                break
+            case "?":
+                google(args.slice(1).join(), msg)
+                break
+            case "rtfm":
+                rtfm(msg)
+                break
         }
 
         console.log(`${msg.author.tag} issued ${args[0]}`)
     }
 
 })
+
 
 
 

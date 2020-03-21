@@ -59,8 +59,8 @@ function mandelbrot(msg: Discord.Message): void {
             msg.channel.send("l'argument N doit être un entier, r v et b des flottants")
         }
     }
-    const width = 500
-    const height = 500
+    const width = 1000
+    const height = 1000
     const level_ratio = 255 / max_n
     //let scalex = 2.0 / width
     //let scaley = 2.0 / height
