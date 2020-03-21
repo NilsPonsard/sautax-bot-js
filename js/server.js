@@ -22,6 +22,12 @@ function help(msg) {
     embed.addField("Aide en ligne ici : ", "http://nilsponsard.software/bot-discord-js.html");
     msg.channel.send("", embed);
 }
+function google(recherche, msg) {
+    msg.channel.send("https://www.google.com/search?q=" + recherche);
+}
+function rtfm(msg) {
+    msg.channel.send({ files: ['https://binuxlubuntu.files.wordpress.com/2009/10/mao_rtfm_vectorize_by_cmenghi.png'] });
+}
 function system(msg) {
     var platform = process.platform;
     var usage = process.resourceUsage();
@@ -70,6 +76,12 @@ client.on('message', function (msg) {
                 break;
             case "cpp":
                 cpp.cpp(msg);
+                break;
+            case "?":
+                google(args.slice(1).join(), msg);
+                break;
+            case "rtfm":
+                rtfm(msg);
                 break;
         }
         console.log(msg.author.tag + " issued " + args[0]);
