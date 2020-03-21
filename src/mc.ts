@@ -18,6 +18,7 @@ export function mc(msg: Discord.Message) {
         switch (args[0]) {
             case "start":
                 msg.reply("starting server")
+                console.log("ssh...")
                 exec("ssh 10.188.27.48 tmux new-session -d -s pixel '/home/sautax/startPixelmon.sh'", (err, stdout, stderr) => {
                     console.log(err, stdout, stderr)
                 })
