@@ -18,7 +18,7 @@ export function mc(msg: Discord.Message) {
         switch (args[0]) {
             case "start":
                 msg.reply("starting server")
-                exec("ssh 10.188.27.48 ./startPixelmon.sh")
+                exec("ssh 10.188.27.48 tmux new-session -d -s pixel '/home/sautax/startPixelmon.sh'")
                 break
         }
     }
