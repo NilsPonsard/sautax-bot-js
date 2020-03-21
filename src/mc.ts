@@ -38,15 +38,17 @@ export function mc(msg: Discord.Message) {
                 } else {
                     msg.reply("vous n'avez pas la permission")
                 }
+                break
             case "say":
                 if (mcModos.lastIndexOf(msg.author.id) !== -1) {
-                    msg.reply("stopping server")
+                    msg.reply(`saying \`${args.slice(1).join(" ")}\` in server chat`)
                     exec(`ssh 10.188.27.48 screen -S pixel -p 0 -X stuff 'say ${args.slice(1).join(" ")} ^M'`, (err, stdout, stderr) => {
                         console.log(err, stdout, stderr)
                     })
                 } else {
                     msg.reply("vous n'avez pas la permission")
                 }
+                break
         }
     }
 
