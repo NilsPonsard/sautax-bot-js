@@ -6,6 +6,8 @@ import * as cpp from "./cpp"
 import * as child_process from "child_process"
 import { userInfo } from "os";
 import * as mc from "./mc"
+import * as utils from "./utils";
+
 const client = new Discord.Client()
 
 let token_file = readFileSync("token")
@@ -13,6 +15,43 @@ let token_file = readFileSync("token")
 const token = token_file.toString().replace("\n", "")
 
 export const prefix = "$"
+
+function roll(msg: Discord.Message) {
+    let args = utils.parse(msg).slice(1)
+
+    try {
+        if (args.length >= 1) {
+            let min = 0
+            let max = 0
+
+            if (args.length === 1) {
+                max = parseInt(args[0])
+            }
+            else if (args.length === 2) {
+                min = parseInt(args[0])
+                max = parseInt(args[1])
+            }
+            msg.reply(`result :  ${Math.round(Math.random() * max - min)}`)
+        }
+        else {
+            msg.reply("Arguments incorrects, utilisation : roll max | roll min max")
+        }
+    } catch (e) {
+        console.log(e)
+
+    }
+    switch (args.length) {
+        case 1:
+
+            break
+        case 2:
+
+            break
+
+    }
+
+}
+
 
 function help(msg: Discord.Message) {
     let embed = new Discord.RichEmbed()
@@ -93,6 +132,9 @@ client.on('message', msg => {
                 break
             case "mc":
                 mc.mc(msg)
+                break
+            case "roll":
+                roll(msg)
                 break
         }
 
