@@ -32,8 +32,8 @@ function roll(msg: Discord.Message) {
                 max = parseInt(args[1])
             }
             let result = Math.round(Math.random() * (max - min) + min)
-            console.log(`roll min ${min} | max ${max}`)
-            if (result == NaN) {
+            console.log(`roll min ${min} | max ${max} | result ${result}`)
+            if (isNaN(result)) {
                 msg.react("thinking")
             }
             else if (min > max) {
