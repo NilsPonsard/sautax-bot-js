@@ -31,6 +31,7 @@ function roll(msg: Discord.Message) {
                 min = parseInt(args[0])
                 max = parseInt(args[1])
             }
+            console.log(`min ${min} | max ${max}`)
             msg.reply(`result :  ${Math.round(Math.random() * (max - min) + min)}`)
         }
         else {
