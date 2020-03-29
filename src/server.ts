@@ -31,8 +31,18 @@ function roll(msg: Discord.Message) {
                 min = parseInt(args[0])
                 max = parseInt(args[1])
             }
-            console.log(`min ${min} | max ${max}`)
-            msg.reply(`result :  ${Math.round(Math.random() * (max - min) + min)}`)
+            console.log(`roll min ${min} | max ${max}`)
+            if (min == NaN || max == NaN) {
+                msg.react("thinking")
+            }
+            else if (min > max) {
+                msg.reply("Boulet, min>max")
+
+            } else {
+                msg.reply(`result :  ${Math.round(Math.random() * (max - min) + min)}`)
+
+            }
+
         }
         else {
             msg.reply("Arguments incorrects, utilisation : roll max | roll min max")
