@@ -34,7 +34,7 @@ function roll(msg: Discord.Message) {
             let result = Math.round(Math.random() * (max - min) + min)
             console.log(`roll min ${min} | max ${max} | result ${result}`)
             if (isNaN(result) || isNaN(min) || isNaN(max)) {
-                msg.react(":thinking:")
+                msg.react("🤔")
             }
             else if (min > max) {
                 msg.reply("Boulet, min>max")
