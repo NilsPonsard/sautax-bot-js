@@ -21,7 +21,7 @@ function roll(msg: Discord.Message) {
 
     try {
         if (args.length >= 1) {
-            let min = 0
+            let min = 1
             let max = 0
 
             if (args.length === 1) {
@@ -31,15 +31,16 @@ function roll(msg: Discord.Message) {
                 min = parseInt(args[0])
                 max = parseInt(args[1])
             }
+            let result = Math.round(Math.random() * (max - min) + min)
             console.log(`roll min ${min} | max ${max}`)
-            if (min == NaN || max == NaN) {
+            if (result == NaN) {
                 msg.react("thinking")
             }
             else if (min > max) {
                 msg.reply("Boulet, min>max")
 
             } else {
-                msg.reply(`result :  ${Math.round(Math.random() * (max - min) + min)}`)
+                msg.reply(`result :  ${result}`)
 
             }
 
