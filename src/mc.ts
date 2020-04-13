@@ -21,7 +21,7 @@ export function mc(msg: Discord.Message) {
 
                     msg.reply("starting server")
 
-                    exec("ssh pixelmon@10.188.27.48 tmux new-session -d -s pixel '/home/pixelmon/server/start.sh'", (err, stdout, stderr) => {
+                    exec("ssh pixelmon@10.188.27.48 '/home/pixelmon/startPixel.sh'", (err, stdout, stderr) => {
                         console.log(err, stdout, stderr)
                     })
                 }
