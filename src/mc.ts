@@ -21,7 +21,7 @@ export function mc(msg: Discord.Message) {
 
                     msg.reply("starting server")
 
-                    exec("ssh 10.188.27.48 tmux new-session -d -s pixel '/home/sautax/startPixelmon.sh'", (err, stdout, stderr) => {
+                    exec("ssh pixelmon@10.188.27.48 tmux new-session -d -s pixel '/home/pixelmon/server/start.sh'", (err, stdout, stderr) => {
                         console.log(err, stdout, stderr)
                     })
                 }
@@ -32,7 +32,7 @@ export function mc(msg: Discord.Message) {
             case "stop":
                 if (mcModos.lastIndexOf(msg.author.id) !== -1) {
                     msg.reply("stopping server")
-                    exec(`ssh 10.188.27.48 'screen -S pixel -p 0 -X stuff "stop^M"'`, (err, stdout, stderr) => {
+                    exec(`ssh pixelmon@10.188.27.48 'screen -S pixel -p 0 -X stuff "stop^M"'`, (err, stdout, stderr) => {
                         console.log(err, stdout, stderr)
                     })
                 } else {
@@ -42,7 +42,7 @@ export function mc(msg: Discord.Message) {
             case "say":
                 if (mcModos.lastIndexOf(msg.author.id) !== -1) {
                     msg.reply(`saying \`${args.slice(1).join(" ")}\` in server chat`)
-                    exec(`ssh 10.188.27.48 'screen -S pixel -p 0 -X stuff "say ${args.slice(1).join(" ")} ^M"'`, (err, stdout, stderr) => {
+                    exec(`ssh pixelomn@10.188.27.48 'screen -S pixel -p 0 -X stuff "say ${args.slice(1).join(" ")} ^M"'`, (err, stdout, stderr) => {
                         console.log(err, stdout, stderr)
                     })
                 } else {
