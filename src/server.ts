@@ -7,6 +7,7 @@ import * as child_process from "child_process"
 import { userInfo } from "os";
 import * as mc from "./mc"
 import * as utils from "./utils";
+import { request } from "http";
 
 const client = new Discord.Client()
 
@@ -15,6 +16,39 @@ let token_file = readFileSync("token")
 const token = token_file.toString().replace("\n", "")
 
 export const prefix = "$"
+
+
+const gitBotURL = "https://github.com/sautax/sautax-bot-js"
+const gitGraphesURL = "https://gitlab.com/nilsponsard/graphes-tools"
+const gitSiteURL = "https://github.com/NilsPonsard/sautax-website"
+
+
+
+function requestFunc(msg: Discord.Message) {
+    let args = utils.parse(msg).slice(1)
+    if (args.length == 0) {
+        msg.reply("Cette fonction permet d'obtenir les liens pour proposer des modifications sur mes projets, les projets disponibles sont : `bot`, `graphes`, `site`")
+
+    }
+    else {
+        let url = "projet non trouvé"
+        let issue = "/issues/new"
+        switch (args[0]) {
+            case "bot":
+                url = gitBotURL + issue
+                break
+            case "graphes":
+                url = gitGraphesURL + issue
+                break
+            case "site":
+                url = gitSiteURL + issue
+                break
+
+        }
+        msg.reply(url)
+    }
+}
+
 
 function roll(msg: Discord.Message) {
     let args = utils.parse(msg).slice(1)
@@ -147,6 +181,9 @@ client.on('message', msg => {
                 break
             case "roll":
                 roll(msg)
+                break
+            case "request":
+                requestFunc(msg)
                 break
         }
 
