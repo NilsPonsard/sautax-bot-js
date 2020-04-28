@@ -4,17 +4,16 @@
     "description": "discord bot ",
     "main": "./js/server.js",
     "dependencies": {
-        "@types/difflib": "^0.2.0",
-        "@types/node": "^12.11.1",
-        "@types/request": "^2.48.2",
         "bufferutil": "^4.0.1",
         "canvas": "^2.6.0",
-        "difflib": "^0.2.4",
         "discord.js": "^11.5.1",
         "node-opus": "^0.3.2",
-        "request": "^2.88.0"
+        "difflib": "^0.2.4"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "@types/node": "^12.12.37",
+        "@types/difflib": "^0.2.0"
+    },
     "scripts": {
         "test": "node ./js/server.js",
         "start": "node ./js/server.js"
