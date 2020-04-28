@@ -1,5 +1,5 @@
 import * as Discord from "discord.js"
-import { readFile } from "fs";
+import { readFile, unwatchFile } from "fs";
 import * as utils from "./utils"
 
 import * as http from "http"
@@ -37,6 +37,11 @@ interface leaugeMatch {
 interface TeamBansDto {
     championId: number,
     pickTurn: number
+}
+interface BannedChampion {
+    championId: number,
+    pickTurn: number,
+    teamId: number
 }
 
 interface TeamStatsDto {
@@ -230,7 +235,41 @@ interface MatchDto {
     gameMode: string,
     participants: Array<ParticipantDto>
 }
+interface Perks {
+    perkIds: Array<number>,
+    perkStyle: number,
+    perkSubStyle: number
+}
+interface GameCustomizationObject {
 
+    category: string,
+    content: string
+}
+interface CurrentGameParticipant {
+    championId: number,
+    perks: Perks,
+    profileIconId: number,
+    bot: boolean,
+    teamId: number,
+    summonerName: string,
+    summonerId: string,
+    spell1Id: number,
+    spell2Id: number,
+    gameCustomizationObjects: Array<GameCustomizationObject>
+}
+
+interface CurrentGameInfo {
+    gameId: number,
+    gameType: string,
+    gameStartTime: number,
+    mapId: number,
+    gameLength: number,
+    platformId: number,
+    gameMode: string,
+    bannedChampions: Array<BannedChampion>,
+    gameQueueConfigId: number,
+    participants:
+}
 
 let riotTokenFile = readFile("riot_token", (err, data) => {
     let t = data.toString()
