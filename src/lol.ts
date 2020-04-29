@@ -9,10 +9,124 @@ import { promises, LookupOneOptions } from "dns";
 import { parse } from "path";
 import { parentPort } from "worker_threads";
 
+interface sumSpellImage {
+    full: string;
+    sprite: string;
+    group: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+}
 
-let items = {}
-let champions = {}
-let version = ""
+interface sumSpell {
+    id: string;
+    name: string;
+    description: string;
+    tooltip: string;
+    maxrank: number;
+    cooldown: number[];
+    cooldownBurn: string;
+    cost: number[];
+    costBurn: string;
+    datavalues: object;
+    effect: number[][];
+    effectBurn: string[];
+    vars: any[];
+    key: string;
+    summonerLevel: number;
+    modes: string[];
+    costType: string;
+    maxammo: string;
+    range: number[];
+    rangeBurn: string;
+    image: sumSpellImage;
+    resource: string;
+}
+
+export interface Rune {
+    id: number;
+    key: string;
+    icon: string;
+    name: string;
+    shortDesc: string;
+    longDesc: string;
+}
+
+export interface Slot {
+    runes: Rune[];
+}
+
+export interface RuneCategory {
+    id: number;
+    key: string;
+    icon: string;
+    name: string;
+    slots: Slot[];
+}
+
+interface championJSON {
+    type: string,
+    format: string,
+    version: string,
+    data: { [key: string]: championObj }
+}
+interface infoChampion {
+    attack: number;
+    defense: number;
+    magic: number;
+    difficulty: number;
+}
+
+interface imagesChampion {
+    full: string;
+    sprite: string;
+    group: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+}
+
+interface statsChampion {
+    hp: number;
+    hpperlevel: number;
+    mp: number;
+    mpperlevel: number;
+    movespeed: number;
+    armor: number;
+    armorperlevel: number;
+    spellblock: number;
+    spellblockperlevel: number;
+    attackrange: number;
+    hpregen: number;
+    hpregenperlevel: number;
+    mpregen: number;
+    mpregenperlevel: number;
+    crit: number;
+    critperlevel: number;
+    attackdamage: number;
+    attackdamageperlevel: number;
+    attackspeedperlevel: number;
+    attackspeed: number;
+}
+
+interface championObj {
+    version: string;
+    id: string;
+    key: string;
+    name: string;
+    title: string;
+    blurb: string;
+    info: infoChampion;
+    image: imagesChampion;
+    tags: string[];
+    partype: string;
+    stats: statsChampion;
+}
+
+
+
 
 
 interface summoner {
@@ -272,7 +386,12 @@ interface CurrentGameInfo {
 }
 
 
-
+let dddragonBaseURL = ""
+let items = {}
+let champions: championJSON
+let runes: Array<RuneCategory>
+let version = ""
+let sumSpells: Array<sumSpell>
 
 let lolHttpsOptions = {
     "headers": {
@@ -286,9 +405,11 @@ https.get('https://ddragon.leagueoflegends.com/api/versions.json', (res: http.In
         data = data + chunck
     })
     res.on("end", () => {
+
         version = JSON.parse(data)[0]
+        dddragonBaseURL = `https://ddragon.leagueoflegends.com/cdn/${version}`
         console.log(`latest lol patch : ${version}`)
-        https.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/fr_FR/item.json`, (res: http.IncomingMessage) => {
+        https.get(dddragonBaseURL + "/data/fr_FR/item.json", (res: http.IncomingMessage) => {
             let data = ""
             res.on("data", (chunck) => {
                 data = data + chunck
@@ -298,13 +419,34 @@ https.get('https://ddragon.leagueoflegends.com/api/versions.json', (res: http.In
 
             })
         })
-        http.get(`http://ddragon.leagueoflegends.com/cdn/${version}/data/fr_FR/champion.json`, (res: http.IncomingMessage) => {
+        https.get(dddragonBaseURL + "/data/fr_FR/champion.json", (res: http.IncomingMessage) => {
             let data = ""
             res.on("data", (chunck) => {
                 data = data + chunck
             })
             res.on("end", () => {
                 champions = JSON.parse(data)
+            })
+        })
+
+        https.get(dddragonBaseURL + "/data/fr_FR/runesReforged.json", (res) => {
+
+            let data = ""
+            res.on("data", (chunck) => {
+                data = data + chunck
+            })
+            res.on("end", () => {
+                runes = JSON.parse(data)
+            })
+        })
+        https.get(dddragonBaseURL + "/data/fr_FR/runesReforged.json", (res) => {
+
+            let data = ""
+            res.on("data", (chunck) => {
+                data = data + chunck
+            })
+            res.on("end", () => {
+                runes = JSON.parse(data)
             })
         })
     })
@@ -409,17 +551,29 @@ function item(msg: Discord.Message): void {
         }
     }
 }
+
+
 function spectate(msg: Discord.Message) {
     let summonerName = utils.parse(msg).slice(2).join(" ")
-    console.log(summonerName)
     summonerByName(summonerName).then((value) => {
-        console.log(value)
         spectator(value.id).then((result) => {
             let blueSide = ""
             let redSide = ""
+
             for (let i = 0; i < result.participants.length; ++i) {
                 let current = result.participants[i]
-                let currentText = `${current.bot ? "BOT " : ""} ${current.summonerName} \n`
+                let championId = current.championId.toString()
+                let championName = ""
+                console.log(current.spell1Id)
+                for (let p in champions.data) {
+                    let curr = champions.data[p]
+
+                    if (curr.key == championId) {
+                        championName = curr.name
+                    }
+                }
+
+                let currentText = `${current.bot ? "BOT " : ""} **${current.summonerName}** : ${championName} \n`
                 if (current.teamId == 100) {
                     blueSide = blueSide + currentText
                 }
@@ -431,15 +585,12 @@ function spectate(msg: Discord.Message) {
             embed.setTitle(`${summonerName}’s game`)
             embed.addField("Blue team", blueSide)
             embed.addField("Red team", redSide)
-            console.log("ah ", embed, redSide)
             msg.channel.send("", embed)
         }, (reason) => {
             msg.channel.send(JSON.stringify(reason))
-
         })
     }, (reason) => {
         msg.channel.send(JSON.stringify(reason))
-
     })
 }
 function spectator(summonerId: string) {
@@ -452,11 +603,10 @@ function spectator(summonerId: string) {
             }
             res.on("data", (chunck: string) => {
                 data = data + chunck
-                console.log(data)
             })
             res.on("end", () => {
                 let parsed = JSON.parse(data)
-                if (parsed.gameId && parsed.gameLength) {
+                if (parsed["gameId"] || parsed.gameId) {
                     let out = <CurrentGameInfo>parsed
                     resolve(out)
                 }
