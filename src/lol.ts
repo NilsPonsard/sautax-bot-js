@@ -431,7 +431,7 @@ function spectate(msg: Discord.Message) {
             embed.setTitle(`${summonerName}’s game`)
             embed.addField("Blue team", blueSide)
             embed.addField("Red team", redSide)
-
+            console.log("ah ", embed, redSide)
             msg.channel.send("", embed)
         }, (reason) => {
             msg.channel.send(JSON.stringify(reason))
