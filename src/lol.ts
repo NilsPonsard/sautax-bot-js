@@ -415,7 +415,25 @@ function spectate(msg: Discord.Message) {
     summonerByName(summonerName).then((value) => {
         console.log(value)
         spectator(value.id).then((result) => {
-            msg.channel.send(JSON.stringify(result.participants[0]))
+            let blueSide = ""
+            let redSide = ""
+            for (let i = 0; i < result.participants.length; ++i) {
+                let current = result.participants[i]
+                let currentText = `${current.bot ? "BOT " : ""} ${current.summonerName} \n`
+                if (current.teamId == 100) {
+                    blueSide = blueSide + currentText
+                }
+                else {
+                    redSide = redSide + currentText
+                }
+            }
+            let embed = new Discord.RichEmbed()
+            embed.setTitle(`${summonerName}’s game`)
+            embed.addField("Blue team", blueSide)
+            embed.addField("Red team", redSide)
+
+
+            msg.channel.send(embed)
         }, (reason) => {
             msg.channel.send(JSON.stringify(reason))
 
