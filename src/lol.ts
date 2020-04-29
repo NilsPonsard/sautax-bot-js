@@ -271,10 +271,7 @@ interface CurrentGameInfo {
     participants: Array<CurrentGameParticipant>
 }
 
-let riotTokenFile = readFile("riot_token", (err, data) => {
-    let t = data.toString()
-    lolHttpsOptions.headers["X-Riot-Token"] = t
-})
+
 
 
 let lolHttpsOptions = {
