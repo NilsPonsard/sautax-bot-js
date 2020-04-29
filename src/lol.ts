@@ -268,7 +268,7 @@ interface CurrentGameInfo {
     gameMode: string,
     bannedChampions: Array<BannedChampion>,
     gameQueueConfigId: number,
-    participants:
+    participants: Array<CurrentGameParticipant>
 }
 
 let riotTokenFile = readFile("riot_token", (err, data) => {
@@ -411,10 +411,47 @@ function item(msg: Discord.Message): void {
                 break
         }
     }
+}
+function spectate(msg: Discord.Message) {
+    let summonerName = utils.parse(msg).slice(3)[0]
+    summonerByName(summonerName).then((value) => {
+        spectator(value.id).then((result) => {
+            msg.channel.send(JSON.stringify(result.participants))
+        })
+    })
+}
+function spectator(summonerId: string) {
+    let promise: Promise<CurrentGameInfo> = new Promise(function (resolve, reject) {
+
+        https.get(`https://euw1.api.riotgames.com/lol/match/v4/matches/${summonerId}`, lolHttpsOptions, (res: http.IncomingMessage) => {
+            let data = ""
+            if (res.statusCode != 200) {
+                reject("not found")
+            }
+            res.on("data", (chunck: string) => {
+                data = data + chunck
+            })
+            res.on("end", () => {
+                let parsed = JSON.parse(data)
+                if (parsed.gameId && parsed.gameLength) {
+                    let out = <CurrentGameInfo>parsed
+                    resolve(out)
+                }
+                else {
+                    reject("data corrupted")
+                }
+            })
+
+        })
+    })
+    return promise
 
 }
 
-function spectateMatch(matchId: number) {
+
+
+
+function matchInfo(matchId: number) {
 
     let promise: Promise<Array<MatchDto>> = new Promise(function (resolve, reject) {
 
@@ -525,6 +562,9 @@ export function lol(msg: Discord.Message): void {
                 break
             case "items":
                 item(msg)
+                break
+            case "spectate":
+                spectate(msg)
                 break
         }
     }
