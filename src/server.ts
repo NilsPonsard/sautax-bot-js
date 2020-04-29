@@ -11,10 +11,6 @@ import { request } from "http";
 
 const client = new Discord.Client()
 
-let token_file = readFileSync("token")
-
-const token = token_file.toString().replace("\n", "")
-
 export const prefix = "$"
 
 
@@ -194,7 +190,11 @@ client.on('message', msg => {
 
 
 
+try {
 
+    client.login(utils.tokens.discord)
+} catch (error) {
 
-client.login(token)
+}
+
 
