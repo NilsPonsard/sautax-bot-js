@@ -13,10 +13,75 @@ var lol = __importStar(require("./lol"));
 var image = __importStar(require("./image"));
 var cpp = __importStar(require("./cpp"));
 var mc = __importStar(require("./mc"));
+var utils = __importStar(require("./utils"));
 var client = new Discord.Client();
 var token_file = fs_1.readFileSync("token");
 var token = token_file.toString().replace("\n", "");
 exports.prefix = "$";
+var gitBotURL = "https://github.com/sautax/sautax-bot-js";
+var gitGraphesURL = "https://gitlab.com/nilsponsard/graphes-tools";
+var gitSiteURL = "https://github.com/NilsPonsard/sautax-website";
+function requestFunc(msg) {
+    var args = utils.parse(msg).slice(1);
+    if (args.length == 0) {
+        msg.reply("Cette fonction permet d'obtenir les liens pour proposer des modifications sur mes projets, les projets disponibles sont : `bot`, `graphes`, `site`");
+    }
+    else {
+        var url = "projet non trouvé";
+        var issue = "/issues/new";
+        switch (args[0]) {
+            case "bot":
+                url = gitBotURL + issue;
+                break;
+            case "graphes":
+                url = gitGraphesURL + issue;
+                break;
+            case "site":
+                url = gitSiteURL + issue;
+                break;
+        }
+        msg.reply(url);
+    }
+}
+function roll(msg) {
+    var args = utils.parse(msg).slice(1);
+    try {
+        if (args.length >= 1) {
+            var min = 1;
+            var max = 0;
+            if (args.length === 1) {
+                max = parseInt(args[0]);
+            }
+            else if (args.length === 2) {
+                min = parseInt(args[0]);
+                max = parseInt(args[1]);
+            }
+            var result = Math.round(Math.random() * (max - min) + min);
+            console.log("roll min " + min + " | max " + max + " | result " + result);
+            if (isNaN(result) || isNaN(min) || isNaN(max)) {
+                msg.react("🤔");
+            }
+            else if (min > max) {
+                msg.reply("Boulet, min>max");
+            }
+            else {
+                msg.reply("result :  " + result);
+            }
+        }
+        else {
+            msg.reply("Arguments incorrects, utilisation : roll max | roll min max");
+        }
+    }
+    catch (e) {
+        console.log(e);
+    }
+    switch (args.length) {
+        case 1:
+            break;
+        case 2:
+            break;
+    }
+}
 function help(msg) {
     var embed = new Discord.RichEmbed();
     embed.setTitle("Aide");
@@ -86,6 +151,12 @@ client.on('message', function (msg) {
                 break;
             case "mc":
                 mc.mc(msg);
+                break;
+            case "roll":
+                roll(msg);
+                break;
+            case "request":
+                requestFunc(msg);
                 break;
         }
         console.log(msg.author.tag + " issued " + args[0]);
