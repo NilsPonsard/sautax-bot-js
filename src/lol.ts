@@ -410,23 +410,32 @@ function item(msg: Discord.Message): void {
     }
 }
 function spectate(msg: Discord.Message) {
-    let summonerName = utils.parse(msg).slice(3)[0]
+    let summonerName = utils.parse(msg).slice(2).join(" ")
+    console.log(summonerName)
     summonerByName(summonerName).then((value) => {
+        console.log(value)
         spectator(value.id).then((result) => {
-            msg.channel.send(JSON.stringify(result.participants))
+            msg.channel.send(JSON.stringify(result.participants[0]))
+        }, (reason) => {
+            msg.channel.send(JSON.stringify(reason))
+
         })
+    }, (reason) => {
+        msg.channel.send(JSON.stringify(reason))
+
     })
 }
 function spectator(summonerId: string) {
     let promise: Promise<CurrentGameInfo> = new Promise(function (resolve, reject) {
-
-        https.get(`https://euw1.api.riotgames.com/lol/match/v4/matches/${summonerId}`, lolHttpsOptions, (res: http.IncomingMessage) => {
+        console.log(summonerId)
+        https.get(`https://euw1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/${summonerId}`, lolHttpsOptions, (res: http.IncomingMessage) => {
             let data = ""
             if (res.statusCode != 200) {
                 reject("not found")
             }
             res.on("data", (chunck: string) => {
                 data = data + chunck
+                console.log(data)
             })
             res.on("end", () => {
                 let parsed = JSON.parse(data)
@@ -540,10 +549,6 @@ function summonerByName(name: string): Promise<summoner> {
     })
     return promise
 }
-summonerByName("sautax").then((res) => {
-    console.log(res.accountId)
-})
-
 
 
 
