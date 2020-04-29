@@ -536,7 +536,7 @@ function getMatcheList(accountId: string) {
 
 function summonerByName(name: string): Promise<summoner> {
     let promise: Promise<summoner> = new Promise(function (resolve, reject) {
-
+        console.log(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}`)
         https.get(`https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}`, lolHttpsOptions, (res: http.IncomingMessage) => {
             let data = ""
             if (res.statusCode != 200) {
