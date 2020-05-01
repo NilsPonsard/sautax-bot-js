@@ -4,24 +4,22 @@ import * as utils from "./utils"
 
 import * as http from "http"
 import * as https from "https"
+import * as canvas from "canvas";
+
 import * as difflib from "difflib"
 import { promises, LookupOneOptions } from "dns";
 import { parse } from "path";
 import { parentPort } from "worker_threads";
+import { Stream, Writable } from "stream";
 
 
 let queues = [
 
     {
-
         "queueId": 0,
-
         "map": "Custom games",
-
         "description": null,
-
         "notes": null
-
     },
 
     {
@@ -131,43 +129,24 @@ let queues = [
         "notes": "Game mode deprecated"
 
     },
-
     {
-
         "queueId": 25,
-
         "map": "Crystal Scar",
-
         "description": "Dominion Co-op vs AI games",
-
         "notes": "Game mode deprecated"
-
     },
-
     {
-
         "queueId": 31,
-
         "map": "Summoner's Rift",
-
         "description": "Co-op vs AI Intro Bot games",
-
         "notes": "Deprecated in patch 7.19 in favor of queueId 830"
-
     },
-
     {
-
         "queueId": 32,
-
         "map": "Summoner's Rift",
-
         "description": "Co-op vs AI Beginner Bot games",
-
         "notes": "Deprecated in patch 7.19 in favor of queueId 840"
-
     },
-
     {
 
         "queueId": 33,
@@ -1525,38 +1504,146 @@ function item(msg: Discord.Message): void {
     }
 }
 
+interface spectatorStatus {
+    objective: number, current: number, cv: canvas.Canvas, summonerName: string, gameMode: string, color: string, startedAt: number
+}
+
+function loadedImageEvent(msg: Discord.Message, status: spectatorStatus) {
+    status.current += 1
+    if (status.objective == status.current) {
+        let f = new Discord.Attachment(status.cv.createPNGStream(), "tab.png")
+        let embed = new Discord.RichEmbed()
+        embed.setTitle(`${status.summonerName}’s ${status.gameMode}`)
+        embed.setImage("attachment://tab.png")
+        embed.setColor(status.color)
+        embed.setTimestamp(status.startedAt)
+        embed.setFooter("Game started at")
+
+        msg.channel.send("", { embed: embed, files: [f] })
+        msg.channel.stopTyping()
+    }
+    // console.log(status.current.toString() + ":" + status.objective.toString())
+
+}
+
 
 function spectate(msg: Discord.Message) {
     let summonerName = utils.parse(msg).slice(2).join(" ")
     summonerByName(summonerName).then((value) => {
         spectator(value.id).then((result) => {
-            let blueSide = ""
-            let redSide = ""
-            let gameMode = ""
-            queues.forEach((value, index) => {
-                if (value.queueId == result.gameQueueConfigId) {
-                    if (value.description) {
-                        gameMode = value.description.replace("games", "game")
+            msg.channel.startTyping()
 
+            let cv = canvas.createCanvas(1600, 1200)
+            let ctx = cv.getContext("2d")
+            let specStatus: spectatorStatus = {
+                objective: result.participants.length * 9 + result.bannedChampions.length,
+                current: 0,
+                cv: cv,
+                summonerName: value.name,
+                gameMode: "",
+                color: "#8B0000",
+                startedAt: result.gameStartTime
+            }
+
+            if (result.gameQueueConfigId == 0 || result.gameQueueConfigId == undefined) {
+                specStatus.gameMode = "Custom Game"
+            } else {
+
+                queues.forEach((value, index) => {
+                    if (value.queueId == result.gameQueueConfigId) {
+                        if (value.description) {
+                            specStatus.gameMode = value.description.replace("games", "game")
+
+                        }
+                    }
+                })
+            }
+
+
+            let blueY = 0
+            let redY = 0
+            let blueX = 0
+            let redX = 800
+            let bans = ""
+            for (let i = 0; i < result.bannedChampions.length; ++i) {
+                let championId = result.bannedChampions[i].championId
+                for (let p in champions.data) {
+                    let curr = champions.data[p]
+
+
+                    if (curr.key == championId.toString()) {
+                        let x = blueX
+                        let y = 1075
+                        if (result.bannedChampions[i].teamId == 200) {
+                            x = redX
+                            redX += 100
+                        } else {
+                            blueX += 100
+                        }
+
+                        bans = bans + curr.name + "\n"
+                        let img = new canvas.Image()
+                        img.src = dddragonBaseURL + `/img/champion/${curr.image.full}`
+                        img.onload = function () {
+                            ctx.drawImage(img, x, y, 100, 100)
+                            loadedImageEvent(msg, specStatus)
+
+                        }
                     }
                 }
-            })
+            }
+            if (bans) {
+
+                ctx.lineWidth = 2
+                ctx.fillStyle = "#afafaf"
+                ctx.font = "bold 40px sans-serif "
+                ctx.fillText("Bans : ", 10, 1040)
+            }
+
+            blueX = 0
+            redX = 800
+
             for (let i = 0; i < result.participants.length; ++i) {
                 let current = result.participants[i]
                 let championId = current.championId.toString()
                 let championName = ""
+                let championIcon = ""
                 let sumSpell1 = ""
                 let sumSpell2 = ""
+                let sumSpell1Icon = ""
+                let sumSpell2Icon = ""
                 let mainPerk = current.perks.perkIds[0]
-                let mainPerkName = ""
+
+                let perks: Array<Rune> = []
+                perks.fill({
+                    id: 0,
+                    key: "",
+                    icon: "",
+                    name: "",
+                    shortDesc: "",
+                    longDesc: ""
+                }, current.perks.perkIds.length)
+
+                let mainPerkIcon = ""
+
+                if (current.summonerId == value.id && current.teamId == 100) {
+                    specStatus.color = "#1E90FF"
+
+                }
+
                 for (let j = 0; j < runes.length; ++j) {
                     let currPage = runes[j]
                     for (let a = 0; a < currPage.slots.length; ++a) {
                         let currSlot = currPage.slots[a]
                         for (let b = 0; b < currSlot.runes.length; ++b) {
                             let currRune = currSlot.runes[b]
+                            let resFind = current.perks.perkIds.lastIndexOf(currRune.id)
+                            if (resFind >= 0) {
+                                perks[resFind] = currRune
+                            }
                             if (currRune.id == mainPerk) {
-                                mainPerkName = currRune.name
+
+                                mainPerkIcon = currRune.icon
                             }
 
                         }
@@ -1565,13 +1652,17 @@ function spectate(msg: Discord.Message) {
                 }
 
 
+
                 for (let p in sumSpells.data) {
                     let curr = sumSpells.data[p]
                     if (current.spell1Id.toString() == curr.key) {
-                        sumSpell1 = curr.name
+
+                        sumSpell1Icon = curr.image.full
                     }
                     if (current.spell2Id.toString() == curr.key) {
-                        sumSpell2 = curr.name
+
+                        sumSpell2Icon = curr.image.full
+
                     }
                 }
 
@@ -1580,40 +1671,84 @@ function spectate(msg: Discord.Message) {
                     let curr = champions.data[p]
 
                     if (curr.key == championId) {
-                        championName = curr.name
+
+                        championIcon = curr.image.full
                     }
                 }
 
-                let currentText = `${current.bot ? "BOT " : ""} **${current.summonerName}** : ${championName} *${mainPerkName}* \`${sumSpell1 + "|" + sumSpell2}\` \n`
+
+                let x = blueX
+                let y = blueY
+
                 if (current.teamId == 100) {
-                    blueSide = blueSide + currentText
+                    blueY += 200
+
                 }
                 else {
-                    redSide = redSide + currentText
-                }
-            }
-            let bans = ""
-            for (let i = 0; i < result.bannedChampions.length; ++i) {
-                let championId = result.bannedChampions[i].championId
-                for (let p in champions.data) {
-                    let curr = champions.data[p]
+                    x = redX
+                    y = redY
+                    redY += 200
 
-                    if (curr.key == championId.toString()) {
-                        bans = bans + curr.name + "\n"
+                }
+
+                ctx.lineWidth = 2
+                ctx.fillStyle = "#afafaf"
+                ctx.font = "bold 40px sans-serif "
+                ctx.fillText(current.summonerName, x + 260, y + 60)
+
+                let championImage = new canvas.Image()
+                championImage.src = dddragonBaseURL + `/img/champion/${championIcon}`
+                championImage.onerror = function () {
+                    msg.channel.send("error loading image")
+                }
+                championImage.onload = function () {
+                    ctx.drawImage(championImage, x + 80, y + 25, 150, 150)
+                    loadedImageEvent(msg, specStatus)
+                }
+
+                let sumSpell1Image = new canvas.Image()
+                sumSpell1Image.src = dddragonBaseURL + `/img/spell/${sumSpell1Icon}`
+                sumSpell1Image.onload = function () {
+                    ctx.drawImage(sumSpell1Image, x, y + 25, 65, 65)
+                    loadedImageEvent(msg, specStatus)
+                }
+
+                let sumSpell2Image = new canvas.Image()
+                sumSpell2Image.src = dddragonBaseURL + `/img/spell/${sumSpell2Icon}`
+                sumSpell2Image.onload = function () {
+                    ctx.drawImage(sumSpell2Image, x, y + 100, 65, 65)
+                    loadedImageEvent(msg, specStatus)
+                }
+
+                perks.forEach((value, index) => {
+                    let perkImage = new canvas.Image()
+                    perkImage.src = `https://ddragon.leagueoflegends.com/cdn/img/${value.icon}`
+                    if (index == 0) {
+
+                        perkImage.onload = function () {
+                            ctx.drawImage(perkImage, x + 240, y + 75, 100, 100)
+                            loadedImageEvent(msg, specStatus)
+                        }
+                    } else {
+                        perkImage.onload = function () {
+                            ctx.drawImage(perkImage, x + 240 + 100 + 52 * (index - 1), y + 100, 50, 50)
+                            loadedImageEvent(msg, specStatus)
+                        }
                     }
-                }
+                })
+
+
+
+
+
+
             }
 
 
 
-            let embed = new Discord.RichEmbed()
-            embed.setTitle(`${summonerName}’s ${gameMode}`)
-            embed.addField("Blue team", blueSide)
-            embed.addField("Red team", redSide)
-            embed.addField("Bans", bans)
-            msg.channel.send("", embed)
+
         }, (reason) => {
-            msg.channel.send(JSON.stringify(reason))
+            msg.channel.send("Summoner not in game")
         })
     }, (reason) => {
         msg.channel.send(JSON.stringify(reason))
@@ -1721,7 +1856,7 @@ function summonerByName(name: string): Promise<summoner> {
             })
             res.on("end", () => {
                 let parsed = JSON.parse(data)
-                if (parsed.id && parsed.accountId && parsed.name && parsed.puuid && parsed.profileIconId && parsed.summonerLevel) {
+                if (parsed.id || parsed["id"]) {
                     let out: summoner = {
                         id: parsed.id,
                         accountId: parsed.accountId,
@@ -1733,7 +1868,7 @@ function summonerByName(name: string): Promise<summoner> {
                     resolve(out)
                 }
                 else {
-                    reject("data corrupted")
+                    reject("summonner data corrupted")
                 }
             })
 
