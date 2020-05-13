@@ -1,13 +1,13 @@
 import * as Discord from "discord.js"
-import { readFileSync } from "fs";
+import {readFileSync} from "fs";
 import * as lol from "./lol"
 import * as image from "./image"
 import * as cpp from "./cpp"
 import * as child_process from "child_process"
-import { userInfo } from "os";
+import {userInfo} from "os";
 import * as mc from "./mc"
 import * as utils from "./utils";
-import { request } from "http";
+import {request} from "http";
 
 const client = new Discord.Client()
 
@@ -19,14 +19,12 @@ const gitGraphesURL = "https://gitlab.com/nilsponsard/graphes-tools"
 const gitSiteURL = "https://github.com/NilsPonsard/sautax-website"
 
 
-
 function requestFunc(msg: Discord.Message) {
     let args = utils.parse(msg).slice(1)
     if (args.length == 0) {
         msg.reply("Cette fonction permet d'obtenir les liens pour proposer des modifications sur mes projets, les projets disponibles sont : `bot`, `graphes`, `site`")
 
-    }
-    else {
+    } else {
         let url = "projet non trouvé"
         let issue = "/issues/new"
         switch (args[0]) {
@@ -56,8 +54,7 @@ function roll(msg: Discord.Message) {
 
             if (args.length === 1) {
                 max = parseInt(args[0])
-            }
-            else if (args.length === 2) {
+            } else if (args.length === 2) {
                 min = parseInt(args[0])
                 max = parseInt(args[1])
             }
@@ -65,8 +62,7 @@ function roll(msg: Discord.Message) {
             console.log(`roll min ${min} | max ${max} | result ${result}`)
             if (isNaN(result) || isNaN(min) || isNaN(max)) {
                 msg.react("🤔")
-            }
-            else if (min > max) {
+            } else if (min > max) {
                 msg.reply("Boulet, min>max")
 
             } else {
@@ -74,8 +70,7 @@ function roll(msg: Discord.Message) {
 
             }
 
-        }
-        else {
+        } else {
             msg.reply("Arguments incorrects, utilisation : roll max | roll min max")
         }
     } catch (e) {
@@ -103,12 +98,13 @@ function help(msg: Discord.Message) {
 
 
 }
+
 function google(recherche: string, msg: Discord.Message): void {
     msg.channel.send(`https://www.google.com/search?q=${recherche}`)
 }
 
 function rtfm(msg: Discord.Message): void {
-    msg.channel.send({ files: ['https://binuxlubuntu.files.wordpress.com/2009/10/mao_rtfm_vectorize_by_cmenghi.png'] })
+    msg.channel.send({files: ['https://binuxlubuntu.files.wordpress.com/2009/10/mao_rtfm_vectorize_by_cmenghi.png']})
 }
 
 
@@ -141,8 +137,9 @@ client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
 })
-client.on('message', msg => {
-    if (msg.content.startsWith(prefix) && msg.author.bot == false) {
+
+function msgListener(msg: Discord.Message) {
+    if (msg.content.startsWith(prefix) && !msg.author.bot) {
         let args = msg.content.replace(prefix, "").split(" ")
         switch (args[0]) {
             case "ping":
@@ -182,12 +179,17 @@ client.on('message', msg => {
                 requestFunc(msg)
                 break
         }
-
         console.log(`${msg.author.tag} issued ${args[0]}`)
     }
+}
 
+
+client.on('message', msg => {
+    msgListener(msg)
 })
-
+client.on("messageUpdate", msg => {
+    msgListener(msg)
+})
 
 
 try {
