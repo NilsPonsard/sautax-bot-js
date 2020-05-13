@@ -187,8 +187,8 @@ function msgListener(msg: Discord.Message) {
 client.on('message', msg => {
     msgListener(msg)
 })
-client.on("messageUpdate", msg => {
-    msgListener(msg)
+client.on("messageUpdate", (oldMsg, newMsg) => {
+    msgListener(newMsg)
 })
 
 
